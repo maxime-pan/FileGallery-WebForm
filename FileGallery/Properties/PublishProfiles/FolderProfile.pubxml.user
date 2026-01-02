@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\project\FileGalleryWebForm\FileGallery\bin\app.publish\</_PublishTargetUrl>
+    <History>True|2026-01-02T04:19:23.5694128Z||;True|2026-01-01T23:03:49.9239765-05:00||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="Admin.aspx">
+      <publishTime>01/01/2026 23:19:09</publishTime>
+    </File>
+    <File Include="bin/FileGallery.dll">
+      <publishTime>01/01/2026 23:19:23</publishTime>
+    </File>
+    <File Include="bin/FileGallery.pdb">
+      <publishTime>01/01/2026 23:19:23</publishTime>
+    </File>
+    <File Include="Default.aspx">
+      <publishTime>01/01/2026 23:03:23</publishTime>
+    </File>
+    <File Include="Login.aspx">
+      <publishTime>01/01/2026 23:08:07</publishTime>
+    </File>
+    <File Include="Upload.aspx">
+      <publishTime>01/01/2026 23:01:45</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>01/01/2026 22:09:58</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

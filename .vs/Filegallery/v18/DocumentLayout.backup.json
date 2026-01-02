@@ -1,0 +1,49 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\project\\FileGalleryWebForm\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8B5E5D7E-4F3C-4A8D-9E2F-1B6C3D4E5F6A}|FileGallery\\FileGallery.csproj|c:\\project\\filegallerywebform\\filegallery\\admin.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
+      "RelativeMoniker": "D:0:0:{8B5E5D7E-4F3C-4A8D-9E2F-1B6C3D4E5F6A}|FileGallery\\FileGallery.csproj|solutionrelative:filegallery\\admin.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1434867872:0:{bf84ea66-d821-4dba-b1b1-2777d8574775}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Admin.aspx",
+              "DocumentMoniker": "C:\\project\\FileGalleryWebForm\\FileGallery\\Admin.aspx",
+              "RelativeDocumentMoniker": "FileGallery\\Admin.aspx",
+              "ToolTip": "C:\\project\\FileGalleryWebForm\\FileGallery\\Admin.aspx",
+              "RelativeToolTip": "FileGallery\\Admin.aspx",
+              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
+              "WhenOpened": "2026-01-02T15:26:45.763Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
