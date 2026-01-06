@@ -622,8 +622,8 @@
                         container.innerHTML = '<p style="padding: 40px; color: #e74c3c;">Error loading file: ' + error.message + '</p>';
                     });
             } else if (['.doc', '.docx'].includes(ext)) {
-                container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Preview not available for Word documents in browser.</p><a href="' + path + '" download class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download Document</a></div>';
-            } else {
+                container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Rendering in browser is not available for Microsoft Word documents.</p><a href="' + path + '" download="' + name + '" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download Document</a></div>';
+            }else {
                 container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Preview not available for this file type.</p><a href="' + path + '" download class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download File</a></div>';
             }
 

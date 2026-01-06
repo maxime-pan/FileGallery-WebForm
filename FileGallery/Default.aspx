@@ -519,7 +519,7 @@
                         container.innerHTML = '<div style="padding: 40px;"><p style="color: #e74c3c; margin-bottom: 15px;">Error loading file: ' + error.message + '</p><a href="' + path + '" download="' + name + '" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download File</a></div>';
                     });
             } else if (['.doc', '.docx'].includes(ext)) {
-                container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Preview not available for Word documents in browser.</p><a href="' + path + '" download="' + name + '" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download Document</a></div>';
+                container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Rendering in browser is not available for Microsoft Word documents.</p><a href="' + path + '" download="' + name + '" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download Document</a></div>';
             } else {
                 container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Preview not available for this file type.</p><a href="' + path + '" download="' + name + '" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download File</a></div>';
             }
