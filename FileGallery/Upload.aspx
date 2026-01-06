@@ -1,8 +1,10 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Upload.aspx.cs" Inherits="FileGallery.Upload" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Upload.aspx.cs" Inherits="FileGallery.Upload" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Upload to Public - File Gallery</title>
     <style>
         * {
@@ -210,7 +212,7 @@
 <body>
     <form id="form1" runat="server">
         <div class="header">
-            <h1>Upload to Public Folder</h1>
+            <h1>📤 Upload to Public Folder</h1>
         </div>
         
         <div class="container">
@@ -221,22 +223,22 @@
                 </div>
                 
                 <div class="info-box">
-                    Files uploaded here will be reviewed by administrators before being published to the gallery.
+                    ℹ️ Files uploaded here will be reviewed by administrators before being published to the gallery.
                 </div>
                 
                 <asp:Panel ID="MessagePanel" runat="server" Visible="false"></asp:Panel>
                 
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileUpload').click();">
-                    <div class="upload-icon"></div>
-                    <div class="upload-text">Click to select a file</div>
-                    <div class="upload-subtext">or drag and drop here</div>
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Click to select files</div>
+                    <div class="upload-subtext">or drag and drop here (multiple files supported)</div>
                 </div>
                 
-                <asp:FileUpload ID="fileUpload" runat="server" CssClass="file-input" onchange="handleFileSelect(this)" />
+                <asp:FileUpload ID="fileUpload" runat="server" CssClass="file-input" AllowMultiple="true" onchange="handleFileSelect(this)" />
                 
                 <div id="selectedFileDiv" style="display: none;">
                     <div class="selected-file">
-                        <div class="selected-file-icon"></div>
+                        <div class="selected-file-icon">📄</div>
                         <div class="selected-file-info">
                             <div class="selected-file-name" id="fileName"></div>
                             <div class="selected-file-size" id="fileSize"></div>
@@ -247,7 +249,7 @@
                 <asp:Button ID="btnUpload" runat="server" Text="Upload File" CssClass="btn btn-primary" OnClick="btnUpload_Click" />
                 
                 <div class="back-link">
-                    <a href="Default.aspx">Back to Gallery</a>
+                    <a href="Default.aspx">← Back to Gallery</a>
                 </div>
             </div>
         </div>
@@ -257,49 +259,49 @@
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileUpload');
         const selectedFileDiv = document.getElementById('selectedFileDiv');
-        
+
         // Prevent default drag behaviors
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             uploadArea.addEventListener(eventName, preventDefaults, false);
             document.body.addEventListener(eventName, preventDefaults, false);
         });
-        
+
         function preventDefaults(e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        
+
         // Highlight drop area
         ['dragenter', 'dragover'].forEach(eventName => {
             uploadArea.addEventListener(eventName, highlight, false);
         });
-        
+
         ['dragleave', 'drop'].forEach(eventName => {
             uploadArea.addEventListener(eventName, unhighlight, false);
         });
-        
+
         function highlight(e) {
             uploadArea.classList.add('dragover');
         }
-        
+
         function unhighlight(e) {
             uploadArea.classList.remove('dragover');
         }
-        
+
         // Handle dropped files
         uploadArea.addEventListener('drop', handleDrop, false);
-        
+
         function handleDrop(e) {
             const dt = e.dataTransfer;
             const files = dt.files;
-            
+
             if (files.length > 0) {
                 // Set the file to the file input
                 fileInput.files = files;
                 handleFileSelect(fileInput);
             }
         }
-        
+
         function handleFileSelect(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -308,7 +310,7 @@
                 selectedFileDiv.style.display = 'block';
             }
         }
-        
+
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;

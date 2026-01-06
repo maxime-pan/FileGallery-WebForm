@@ -1,7 +1,0 @@
-C:\project\FileGalleryWebForm\FileGallery\bin\FileGallery.dll.config
-C:\project\FileGalleryWebForm\FileGallery\bin\FileGallery.dll
-C:\project\FileGalleryWebForm\FileGallery\bin\FileGallery.pdb
-C:\project\FileGalleryWebForm\FileGallery\obj\Debug\FileGallery.csproj.AssemblyReference.cache
-C:\project\FileGalleryWebForm\FileGallery\obj\Debug\FileGallery.csproj.CoreCompileInputs.cache
-C:\project\FileGalleryWebForm\FileGallery\obj\Debug\FileGallery.dll
-C:\project\FileGalleryWebForm\FileGallery\obj\Debug\FileGallery.pdb

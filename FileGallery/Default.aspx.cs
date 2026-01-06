@@ -1,8 +1,11 @@
 using System;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 
 namespace FileGallery
 {
@@ -50,6 +53,9 @@ namespace FileGallery
             {
                 CategoryNameLiteral.Text = selectedCategory;
                 files = GetFilesInCategory(selectedCategory);
+
+                // Load markdown if exists
+                LoadMarkdown(selectedCategory);
             }
             else
             {
@@ -60,24 +66,144 @@ namespace FileGallery
             if (files.Count == 0)
             {
                 NoFilesPanel.Visible = true;
-                FileRepeater.Visible = false;
+                FileListPanel.Visible = false;
             }
             else
             {
                 NoFilesPanel.Visible = false;
-                FileRepeater.Visible = true;
+                FileListPanel.Visible = true;
+                FileCountLiteral.Text = $"{files.Count} {(files.Count == 1 ? "file" : "files")}";
 
-                var fileData = files.Select(f => new
+                var fileData = files.Select(f => new FileDisplayData
                 {
                     FileName = f.Name,
                     FilePath = ResolveUrl("~/FileHandler.ashx?category=" + Server.UrlEncode(GetCategoryForFile(f.FullName)) + "&file=" + Server.UrlEncode(f.Name)),
                     Extension = f.Extension,
-                    Category = GetCategoryForFile(f.FullName)
+                    Category = GetCategoryForFile(f.FullName),
+                    Size = FormatFileSize(f.Length),
+                    Modified = f.LastWriteTime.ToString("MMM dd, yyyy")
                 }).ToList();
 
                 FileRepeater.DataSource = fileData;
                 FileRepeater.DataBind();
             }
+        }
+
+        private void LoadMarkdown(string category)
+        {
+            string readmePath = Path.Combine(uploadsPath, category, "README.md");
+
+            if (File.Exists(readmePath))
+            {
+                try
+                {
+                    string markdownText = File.ReadAllText(readmePath);
+                    string html = ConvertMarkdownToHtml(markdownText);
+
+                    MarkdownContent.Text = html;
+                    MarkdownPanel.Visible = true;
+                }
+                catch (Exception ex)
+                {
+                    // Silently fail if markdown cannot be loaded
+                    MarkdownPanel.Visible = false;
+                    System.Diagnostics.Trace.WriteLine(ex);
+                }
+            }
+            else
+            {
+                MarkdownPanel.Visible = false;
+            }
+        }
+
+        private string ConvertMarkdownToHtml(string markdown)
+        {
+            // Simple markdown parser
+            var html = markdown;
+
+            // Convert headers
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"^### (.*?)$", "<h3>$1</h3>", System.Text.RegularExpressions.RegexOptions.Multiline);
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"^## (.*?)$", "<h2>$1</h2>", System.Text.RegularExpressions.RegexOptions.Multiline);
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"^# (.*?)$", "<h1>$1</h1>", System.Text.RegularExpressions.RegexOptions.Multiline);
+
+            // Convert bold and italic
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\*\*\*(.*?)\*\*\*", "<strong><em>$1</em></strong>");
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\*\*(.*?)\*\*", "<strong>$1</strong>");
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\*(.*?)\*", "<em>$1</em>");
+
+            // Convert inline code
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"`([^`]+)`", "<code>$1</code>");
+
+            // Convert links
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\[([^\]]+)\]\(([^\)]+)\)", "<a href=\"$2\">$1</a>");
+
+            // Convert lists
+            var lines = html.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            var result = new System.Text.StringBuilder();
+            bool inList = false;
+
+            foreach (var line in lines)
+            {
+                if (line.TrimStart().StartsWith("- ") || line.TrimStart().StartsWith("* "))
+                {
+                    if (!inList)
+                    {
+                        result.Append("<ul>");
+                        inList = true;
+                    }
+                    result.Append("<li>").Append(line.TrimStart().Substring(2)).Append("</li>");
+                }
+                else if (System.Text.RegularExpressions.Regex.IsMatch(line.TrimStart(), @"^\d+\. "))
+                {
+                    if (!inList)
+                    {
+                        result.Append("<ol>");
+                        inList = true;
+                    }
+                    var content = System.Text.RegularExpressions.Regex.Replace(line.TrimStart(), @"^\d+\. ", "");
+                    result.Append("<li>").Append(content).Append("</li>");
+                }
+                else
+                {
+                    if (inList)
+                    {
+                        result.Append("</ul>");
+                        inList = false;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        if (!line.StartsWith("<h") && !line.StartsWith("<ul") && !line.StartsWith("<ol"))
+                        {
+                            result.Append("<p>").Append(line).Append("</p>");
+                        }
+                        else
+                        {
+                            result.Append(line);
+                        }
+                    }
+                }
+            }
+
+            if (inList)
+            {
+                result.Append("</ul>");
+            }
+
+            return result.ToString();
+        }
+
+        private string FormatFileSize(long bytes)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB" };
+            double len = bytes;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len = len / 1024;
+            }
+            return $"{len:0.##} {sizes[order]}";
         }
 
         private List<string> GetCategories()
@@ -109,7 +235,7 @@ namespace FileGallery
             {
                 return new DirectoryInfo(categoryPath)
                     .GetFiles()
-                    .Where(f => f.Name != ".gitkeep")
+                    .Where(f => f.Name != ".gitkeep" && f.Extension.ToLower() != ".md")
                     .OrderBy(f => f.Name)
                     .ToList();
             }
@@ -171,5 +297,16 @@ namespace FileGallery
                 default: return "📎";
             }
         }
+    }
+
+    // Helper class for file display data
+    public class FileDisplayData
+    {
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
+        public string Extension { get; set; }
+        public string Category { get; set; }
+        public string Size { get; set; }
+        public string Modified { get; set; }
     }
 }

@@ -42,6 +42,15 @@ namespace FileGallery
         protected global::System.Web.UI.WebControls.Literal CategoryNameLiteral;
 
         /// <summary>
+        /// FileCountLiteral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal FileCountLiteral;
+
+        /// <summary>
         /// NoFilesPanel control.
         /// </summary>
         /// <remarks>
@@ -51,6 +60,15 @@ namespace FileGallery
         protected global::System.Web.UI.WebControls.Panel NoFilesPanel;
 
         /// <summary>
+        /// FileListPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel FileListPanel;
+
+        /// <summary>
         /// FileRepeater control.
         /// </summary>
         /// <remarks>
@@ -58,5 +76,41 @@ namespace FileGallery
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater FileRepeater;
+
+        /// <summary>
+        /// MarkdownEmptyClass control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal MarkdownEmptyClass;
+
+        /// <summary>
+        /// MarkdownPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel MarkdownPanel;
+
+        /// <summary>
+        /// MarkdownContent control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal MarkdownContent;
+
+        /// <summary>
+        /// NoMarkdownPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel NoMarkdownPanel;
     }
 }

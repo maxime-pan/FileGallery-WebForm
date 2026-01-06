@@ -1,8 +1,10 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Admin.aspx.cs" Inherits="FileGallery.Admin" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Admin.aspx.cs" Inherits="FileGallery.Admin" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Admin Dashboard - File Gallery</title>
     <style>
         * {
@@ -277,16 +279,88 @@
             color: #777;
             margin-top: 5px;
         }
+        
+        .markdown-content {
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .markdown-content h1 {
+            font-size: 28px;
+            margin: 20px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .markdown-content h2 {
+            font-size: 24px;
+            margin: 20px 0 10px 0;
+        }
+        
+        .markdown-content h3 {
+            font-size: 20px;
+            margin: 15px 0 10px 0;
+        }
+        
+        .markdown-content p {
+            margin: 10px 0;
+        }
+        
+        .markdown-content ul, .markdown-content ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+        
+        .markdown-content li {
+            margin: 5px 0;
+        }
+        
+        .markdown-content code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .markdown-content pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .markdown-content pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        .markdown-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+            margin: 15px 0;
+            color: #666;
+        }
+        
+        .markdown-content a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .markdown-content a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
         <div class="header">
-            <h1>Admin Dashboard</h1>
+            <h1>🛠️ Admin Dashboard</h1>
             <div class="header-links">
                 <span style="margin-right: 10px;">Welcome, admin</span>
-                <a href="Default.aspx">Gallery</a>
-                <asp:Button ID="btnLogout" runat="server" Text="Logout" CssClass="btn-logout" OnClick="btnLogout_Click" />
+                <a href="Default.aspx">🏠 Gallery</a>
+                <asp:Button ID="btnLogout" runat="server" Text="🚪 Logout" CssClass="btn-logout" OnClick="btnLogout_Click" />
             </div>
         </div>
         
@@ -310,14 +384,14 @@
             
             <!-- Category Management -->
             <div class="section">
-                <div class="section-title">Category Management</div>
+                <div class="section-title">📁 Category Management</div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="txtNewCategory">New Category Name</label>
                         <asp:TextBox ID="txtNewCategory" runat="server" placeholder="Enter category name"></asp:TextBox>
                     </div>
-                    <asp:Button ID="btnAddCategory" runat="server" Text="Add Category" CssClass="btn btn-primary" OnClick="btnAddCategory_Click" />
+                    <asp:Button ID="btnAddCategory" runat="server" Text="➕ Add Category" CssClass="btn btn-primary" OnClick="btnAddCategory_Click" />
                 </div>
                 
                 <div class="category-list">
@@ -326,7 +400,7 @@
                             <div class="category-tag">
                                 <span><%# Eval("Name") %> (<%# Eval("FileCount") %> files)</span>
                                 <asp:Button ID="btnDeleteCategory" runat="server" 
-                                    Text="x" 
+                                    Text="✖" 
                                     CssClass="btn btn-danger" 
                                     CommandArgument='<%# Eval("Name") %>'
                                     OnClick="btnDeleteCategory_Click"
@@ -339,24 +413,80 @@
             
             <!-- File Upload -->
             <div class="section">
-                <div class="section-title">Upload Files</div>
+                <div class="section-title">⬆️ Upload Files</div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Select Category</label>
+                        <label for="ddlUploadCategory">Select Category</label>
                         <asp:DropDownList ID="ddlUploadCategory" runat="server"></asp:DropDownList>
                     </div>
                     <div class="form-group">
-                        <label>Select File</label>
-                        <asp:FileUpload ID="fileUpload" runat="server" />
+                        <label for="fileUpload">Select Files (Multiple)</label>
+                        <asp:FileUpload ID="fileUpload" runat="server" AllowMultiple="true" />
+                        <small style="color: #666; display: block; margin-top: 5px;">Hold Ctrl (Cmd on Mac) to select multiple files</small>
                     </div>
-                    <asp:Button ID="btnUpload" runat="server" Text="Upload File" CssClass="btn btn-success" OnClick="btnUpload_Click" />
+                    <asp:Button ID="btnUpload" runat="server" Text="Upload Files" CssClass="btn btn-success" OnClick="btnUpload_Click" />
+                </div>
+            </div>
+            
+            <!-- Category README Management -->
+            <div class="section">
+                <div class="section-title">📝 Category README Upload</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ddlReadmeCategory">Select Category</label>
+                        <asp:DropDownList ID="ddlReadmeCategory" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlReadmeCategory_SelectedIndexChanged"></asp:DropDownList>
+                    </div>
+                    <div class="form-group">
+                        <label for="fileMarkdown">Upload README.md File</label>
+                        <asp:FileUpload ID="fileMarkdown" runat="server" accept=".md,.txt" />
+                    </div>
+                    <asp:Button ID="btnUploadMarkdown" runat="server" Text="📤 Upload README" CssClass="btn btn-success" OnClick="btnUploadMarkdown_Click" />
+                </div>
+                
+                <asp:Panel ID="CurrentMarkdownPanel" runat="server" Visible="false" style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #e8f4f8; border-radius: 6px;">
+                        <div>
+                            <strong>📄 Current README:</strong> README.md
+                            <span style="margin-left: 15px; color: #666;">
+                                <asp:Literal ID="litMarkdownSize" runat="server"></asp:Literal>
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <asp:Button ID="btnPreviewMarkdown" runat="server" Text="👁️ Preview" CssClass="btn btn-primary" OnClick="btnPreviewMarkdown_Click" style="padding: 6px 15px; font-size: 13px;" />
+                            <asp:Button ID="btnDownloadMarkdown" runat="server" Text="⬇️ Download" CssClass="btn btn-success" OnClick="btnDownloadMarkdown_Click" style="padding: 6px 15px; font-size: 13px;" />
+                            <asp:Button ID="btnDeleteMarkdown" runat="server" Text="🗑️ Delete" CssClass="btn btn-danger" OnClick="btnDeleteMarkdown_Click" 
+                                OnClientClick="return confirm('Delete README.md for this category?');" style="padding: 6px 15px; font-size: 13px;" />
+                        </div>
+                    </div>
+                </asp:Panel>
+                
+                <asp:Panel ID="MarkdownPreviewPanel" runat="server" Visible="false" style="margin-top: 20px; padding: 20px; background: #f9f9f9; border: 2px solid #ddd; border-radius: 6px; max-height: 400px; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">Preview:</h3>
+                        <span style="cursor: pointer; font-size: 20px;" onclick="document.getElementById('<%= MarkdownPreviewPanel.ClientID %>').style.display='none'">✖</span>
+                    </div>
+                    <div class="markdown-content">
+                        <asp:Literal ID="MarkdownPreview" runat="server"></asp:Literal>
+                    </div>
+                </asp:Panel>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #e8f4f8; border-left: 4px solid #3498db; font-size: 13px;">
+                    <strong>💡 Instructions:</strong>
+                    <ul style="margin: 5px 0 0 20px; padding: 0;">
+                        <li>Select a category from the dropdown</li>
+                        <li>Choose a <strong>.md</strong> or <strong>.txt</strong> file containing markdown content</li>
+                        <li>Click "Upload README" to upload</li>
+                        <li>The README will display in the lower 1/3 of the category view</li>
+                        <li>Supports: headers (#), bold (**text**), italic (*text*), lists (- item), links ([text](url))</li>
+                    </ul>
                 </div>
             </div>
             
             <!-- File Management -->
             <div class="section">
-                <div class="section-title">Manage Files</div>
+                <div class="section-title">📄 Manage Files</div>
                 
                 <table class="file-table">
                     <thead>
@@ -380,10 +510,10 @@
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-primary" 
                                                 onclick="previewFile('<%# Eval("FilePath") %>', '<%# Eval("Extension") %>', '<%# Eval("FileName") %>')">
-                                                Preview
+                                                👁️ Preview
                                             </button>
                                             <asp:Button ID="btnDeleteFile" runat="server" 
-                                                Text="Delete" 
+                                                Text="🗑️ Delete" 
                                                 CssClass="btn btn-danger" 
                                                 CommandArgument='<%# Eval("FullPath") %>'
                                                 OnClick="btnDeleteFile_Click"
@@ -399,7 +529,7 @@
             
             <!-- Public Uploads -->
             <div class="section public-section">
-                <div class="section-title">Public Uploads (Moderation Queue)</div>
+                <div class="section-title">📤 Public Uploads (Moderation Queue)</div>
                 
                 <table class="file-table">
                     <thead>
@@ -421,11 +551,11 @@
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-primary" 
                                                 onclick="previewFile('<%# Eval("FilePath") %>', '<%# Eval("Extension") %>', '<%# Eval("FileName") %>')">
-                                                Preview
+                                                👁️ Preview
                                             </button>
-                                            <a href="<%# Eval("FilePath") %>" download class="btn btn-success">Download</a>
+                                            <a href="<%# Eval("FilePath") %>" download class="btn btn-success">⬇️ Download</a>
                                             <asp:Button ID="btnDeletePublicFile" runat="server" 
-                                                Text="Delete" 
+                                                Text="🗑️ Delete" 
                                                 CssClass="btn btn-danger" 
                                                 CommandArgument='<%# Eval("FullPath") %>'
                                                 OnClick="btnDeletePublicFile_Click"
@@ -451,52 +581,83 @@
     
     <script>
         function previewFile(path, ext, name) {
+            console.log('Preview file:', path, ext, name); // Debug log
+
             const modal = document.getElementById('previewModal');
             const container = document.getElementById('previewContainer');
             const title = document.getElementById('previewTitle');
-            
+
             title.textContent = name;
             container.innerHTML = '';
-            
+
             ext = ext.toLowerCase();
-            
+
             if (['.jpg', '.jpeg', '.png', '.gif', '.bmp'].includes(ext)) {
-                container.innerHTML = '<img src="' + path + '" style="max-width: 100%; max-height: 70vh;" alt="' + name + '">';
+                container.innerHTML = '<img src="' + path + '" style="max-width: 100%; max-height: 70vh;" alt="' + name + '" onerror="handleImageError(this)">';
             } else if (['.mp4', '.webm', '.ogg'].includes(ext)) {
-                container.innerHTML = '<video controls style="max-width: 100%; max-height: 70vh;"><source src="' + path + '">Your browser does not support the video tag.</video>';
-            } else if (['.mp3', '.wav', '.ogg'].includes(ext)) {
-                container.innerHTML = '<audio controls style="width: 100%;"><source src="' + path + '">Your browser does not support the audio tag.</audio>';
+                container.innerHTML = '<video controls style="max-width: 100%; max-height: 70vh;"><source src="' + path + '" type="video/' + ext.substring(1) + '">Your browser does not support the video tag.</video>';
+            } else if (['.mp3', '.wav'].includes(ext)) {
+                container.innerHTML = '<audio controls style="width: 100%;"><source src="' + path + '" type="audio/' + (ext === '.mp3' ? 'mpeg' : 'wav') + '">Your browser does not support the audio tag.</audio>';
+            } else if (ext === '.ogg') {
+                container.innerHTML = '<audio controls style="width: 100%;"><source src="' + path + '" type="audio/ogg">Your browser does not support the audio tag.</audio>';
             } else if (ext === '.pdf') {
-                container.innerHTML = '<embed src="' + path + '" type="application/pdf" width="100%" height="600px">';
+                // Use object tag with embed fallback for better PDF support
+                container.innerHTML = '<object data="' + path + '" type="application/pdf" width="100%" height="600px" style="border: none;">' +
+                    '<embed src="' + path + '" type="application/pdf" width="100%" height="600px" style="border: none;" />' +
+                    '<div style="padding: 40px; text-align: center;">' +
+                    '<p style="margin-bottom: 15px;">Your browser does not support PDF preview.</p>' +
+                    '<a href="' + path + '" download="' + name + '" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download PDF</a>' +
+                    '</div>' +
+                    '</object>';
             } else if (ext === '.txt') {
                 fetch(path)
-                    .then(response => response.text())
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to load file');
+                        return response.text();
+                    })
                     .then(text => {
-                        container.innerHTML = '<pre style="text-align: left; padding: 20px; background: #f5f5f5; border-radius: 5px; max-height: 600px; overflow: auto; white-space: pre-wrap;">' + escapeHtml(text) + '</pre>';
+                        container.innerHTML = '<pre style="text-align: left; padding: 20px; background: #f5f5f5; border-radius: 5px; max-height: 600px; overflow: auto; white-space: pre-wrap; word-wrap: break-word;">' + escapeHtml(text) + '</pre>';
+                    })
+                    .catch(error => {
+                        container.innerHTML = '<p style="padding: 40px; color: #e74c3c;">Error loading file: ' + error.message + '</p>';
                     });
+            } else if (['.doc', '.docx'].includes(ext)) {
+                container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Preview not available for Word documents in browser.</p><a href="' + path + '" download class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download Document</a></div>';
             } else {
-                container.innerHTML = '<p style="padding: 40px;">Preview not available for this file type. <a href="' + path + '" download>Download file</a></p>';
+                container.innerHTML = '<div style="padding: 40px; text-align: center;"><p style="margin-bottom: 20px;">Preview not available for this file type.</p><a href="' + path + '" download class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Download File</a></div>';
             }
-            
+
             modal.style.display = 'block';
         }
-        
+
+        function handleImageError(img) {
+            img.style.display = 'none';
+            img.parentElement.innerHTML += '<p style="color: #e74c3c; padding: 20px;">Failed to load image. <a href="' + img.src + '" download>Download instead</a></p>';
+        }
+
         function closeModal() {
             document.getElementById('previewModal').style.display = 'none';
         }
-        
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
-        window.onclick = function(event) {
+
+        window.onclick = function (event) {
             const modal = document.getElementById('previewModal');
             if (event.target == modal) {
                 closeModal();
             }
         }
+
+        // Add keyboard support for closing modal
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -81,9 +82,18 @@ namespace FileGallery
         {
             var categories = GetCategories();
             ddlUploadCategory.Items.Clear();
+            ddlReadmeCategory.Items.Clear();
+
             foreach (var category in categories)
             {
                 ddlUploadCategory.Items.Add(new ListItem(category, category));
+                ddlReadmeCategory.Items.Add(new ListItem(category, category));
+            }
+
+            // Load README for first category if exists
+            if (categories.Count > 0)
+            {
+                LoadReadmeForCategory(categories[0]);
             }
         }
 
@@ -180,9 +190,9 @@ namespace FileGallery
 
         protected void btnUpload_Click(object sender, EventArgs e)
         {
-            if (!fileUpload.HasFile)
+            if (!fileUpload.HasFiles)
             {
-                ShowMessage("Please select a file to upload.", "error");
+                ShowMessage("Please select at least one file to upload.", "error");
                 return;
             }
 
@@ -194,18 +204,59 @@ namespace FileGallery
                 Directory.CreateDirectory(categoryPath);
             }
 
-            string fileName = Path.GetFileName(fileUpload.FileName);
-            string filePath = Path.Combine(categoryPath, fileName);
+            int successCount = 0;
+            int failCount = 0;
+            var errorMessages = new List<string>();
 
             try
             {
-                fileUpload.SaveAs(filePath);
-                ShowMessage($"File '{fileName}' uploaded successfully to '{category}'.", "success");
+                foreach (
+                    HttpPostedFile uploadedFile in fileUpload.PostedFiles)
+                {
+                    try
+                    {
+                        string fileName = Path.GetFileName(uploadedFile.FileName);
+                        string filePath = Path.Combine(categoryPath, fileName);
+
+                        // Check if file already exists
+                        if (File.Exists(filePath))
+                        {
+                            errorMessages.Add($"'{fileName}' already exists");
+                            failCount++;
+                            continue;
+                        }
+
+                        uploadedFile.SaveAs(filePath);
+                        successCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        failCount++;
+                        errorMessages.Add($"Error uploading '{Path.GetFileName(uploadedFile.FileName)}': {ex.Message}");
+                    }
+                }
+
+                // Show result message
+                if (successCount > 0 && failCount == 0)
+                {
+                    ShowMessage($"Successfully uploaded {successCount} file(s) to '{category}'.", "success");
+                }
+                else if (successCount > 0 && failCount > 0)
+                {
+                    string msg = $"Uploaded {successCount} file(s) successfully. {failCount} failed:<br/>" + string.Join("<br/>", errorMessages);
+                    ShowMessage(msg, "error");
+                }
+                else
+                {
+                    string msg = $"Failed to upload all files:<br/>" + string.Join("<br/>", errorMessages);
+                    ShowMessage(msg, "error");
+                }
+
                 LoadData();
             }
             catch (Exception ex)
             {
-                ShowMessage($"Error uploading file: {ex.Message}", "error");
+                ShowMessage($"Error uploading files: {ex.Message}", "error");
             }
         }
 
@@ -255,6 +306,268 @@ namespace FileGallery
             Response.Redirect("Default.aspx");
         }
 
+        protected void ddlReadmeCategory_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedCategory = ddlReadmeCategory.SelectedValue;
+            CheckMarkdownExists(selectedCategory);
+        }
+
+        protected void btnUploadMarkdown_Click(object sender, EventArgs e)
+        {
+            if (!fileMarkdown.HasFile)
+            {
+                ShowMessage("Please select a markdown file to upload.", "error");
+                return;
+            }
+
+            string category = ddlReadmeCategory.SelectedValue;
+            if (string.IsNullOrEmpty(category))
+            {
+                ShowMessage("Please select a category.", "error");
+                return;
+            }
+
+            string fileName = Path.GetFileName(fileMarkdown.FileName);
+            string extension = Path.GetExtension(fileName).ToLower();
+
+            if (extension != ".md" && extension != ".txt")
+            {
+                ShowMessage("Only .md or .txt files are allowed.", "error");
+                return;
+            }
+
+            string categoryPath = Path.Combine(uploadsPath, category);
+            string readmePath = Path.Combine(categoryPath, "README.md");
+
+            try
+            {
+                fileMarkdown.SaveAs(readmePath);
+                ShowMessage($"README.md uploaded successfully for category '{category}'.", "success");
+                CheckMarkdownExists(category);
+                MarkdownPreviewPanel.Visible = false;
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error uploading README: {ex.Message}", "error");
+            }
+        }
+
+        protected void btnPreviewMarkdown_Click(object sender, EventArgs e)
+        {
+            string category = ddlReadmeCategory.SelectedValue;
+            if (string.IsNullOrEmpty(category))
+            {
+                ShowMessage("Please select a category.", "error");
+                return;
+            }
+
+            string categoryPath = Path.Combine(uploadsPath, category);
+            string readmePath = Path.Combine(categoryPath, "README.md");
+
+            if (!File.Exists(readmePath))
+            {
+                ShowMessage("No README.md file exists for this category.", "error");
+                return;
+            }
+
+            try
+            {
+                string markdownText = File.ReadAllText(readmePath);
+                string html = ConvertMarkdownToHtml(markdownText);
+                MarkdownPreview.Text = html;
+                MarkdownPreviewPanel.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error loading README: {ex.Message}", "error");
+            }
+        }
+
+        protected void btnDownloadMarkdown_Click(object sender, EventArgs e)
+        {
+            string category = ddlReadmeCategory.SelectedValue;
+            if (string.IsNullOrEmpty(category))
+            {
+                ShowMessage("Please select a category.", "error");
+                return;
+            }
+
+            string categoryPath = Path.Combine(uploadsPath, category);
+            string readmePath = Path.Combine(categoryPath, "README.md");
+
+            if (!File.Exists(readmePath))
+            {
+                ShowMessage("No README.md file exists for this category.", "error");
+                return;
+            }
+
+            try
+            {
+                Response.Clear();
+                Response.ContentType = "text/markdown";
+                Response.AddHeader("Content-Disposition", $"attachment; filename=\"{category}_README.md\"");
+                Response.TransmitFile(readmePath);
+                Response.End();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error downloading README: {ex.Message}", "error");
+            }
+        }
+
+        protected void btnDeleteMarkdown_Click(object sender, EventArgs e)
+        {
+            string category = ddlReadmeCategory.SelectedValue;
+
+            if (string.IsNullOrEmpty(category))
+            {
+                ShowMessage("Please select a category.", "error");
+                return;
+            }
+
+            string categoryPath = Path.Combine(uploadsPath, category);
+            string readmePath = Path.Combine(categoryPath, "README.md");
+
+            try
+            {
+                if (File.Exists(readmePath))
+                {
+                    File.Delete(readmePath);
+                    MarkdownPreviewPanel.Visible = false;
+                    CheckMarkdownExists(category);
+                    ShowMessage($"README.md deleted successfully for category '{category}'.", "success");
+                }
+                else
+                {
+                    ShowMessage("README.md does not exist for this category.", "error");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error deleting README: {ex.Message}", "error");
+            }
+        }
+
+        private void CheckMarkdownExists(string category)
+        {
+            string categoryPath = Path.Combine(uploadsPath, category);
+            string readmePath = Path.Combine(categoryPath, "README.md");
+
+            if (File.Exists(readmePath))
+            {
+                CurrentMarkdownPanel.Visible = true;
+                FileInfo fileInfo = new FileInfo(readmePath);
+                litMarkdownSize.Text = $"{FormatFileSize(fileInfo.Length)} • Last modified: {fileInfo.LastWriteTime:MMM dd, yyyy HH:mm}";
+            }
+            else
+            {
+                CurrentMarkdownPanel.Visible = false;
+            }
+
+            MarkdownPreviewPanel.Visible = false;
+        }
+
+        private void LoadReadmeForCategory(string category)
+        {
+            CheckMarkdownExists(category);
+        }
+
+        private string ConvertMarkdownToHtml(string markdown)
+        {
+            var html = markdown;
+
+            // Convert headers
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"^### (.*?)$", "<h3>$1</h3>", System.Text.RegularExpressions.RegexOptions.Multiline);
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"^## (.*?)$", "<h2>$1</h2>", System.Text.RegularExpressions.RegexOptions.Multiline);
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"^# (.*?)$", "<h1>$1</h1>", System.Text.RegularExpressions.RegexOptions.Multiline);
+
+            // Convert bold and italic
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\*\*\*(.*?)\*\*\*", "<strong><em>$1</em></strong>");
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\*\*(.*?)\*\*", "<strong>$1</strong>");
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\*(.*?)\*", "<em>$1</em>");
+
+            // Convert inline code
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"`([^`]+)`", "<code>$1</code>");
+
+            // Convert links
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"\[([^\]]+)\]\(([^\)]+)\)", "<a href=\"$2\">$1</a>");
+
+            // Convert lists
+            var lines = html.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            var result = new System.Text.StringBuilder();
+            bool inList = false;
+            bool inOrderedList = false;
+
+            foreach (var line in lines)
+            {
+                if (line.TrimStart().StartsWith("- ") || line.TrimStart().StartsWith("* "))
+                {
+                    if (!inList)
+                    {
+                        if (inOrderedList)
+                        {
+                            result.Append("</ol>");
+                            inOrderedList = false;
+                        }
+                        result.Append("<ul>");
+                        inList = true;
+                    }
+                    result.Append("<li>").Append(line.TrimStart().Substring(2)).Append("</li>");
+                }
+                else if (System.Text.RegularExpressions.Regex.IsMatch(line.TrimStart(), @"^\d+\. "))
+                {
+                    if (!inOrderedList)
+                    {
+                        if (inList)
+                        {
+                            result.Append("</ul>");
+                            inList = false;
+                        }
+                        result.Append("<ol>");
+                        inOrderedList = true;
+                    }
+                    var content = System.Text.RegularExpressions.Regex.Replace(line.TrimStart(), @"^\d+\. ", "");
+                    result.Append("<li>").Append(content).Append("</li>");
+                }
+                else
+                {
+                    if (inList)
+                    {
+                        result.Append("</ul>");
+                        inList = false;
+                    }
+                    if (inOrderedList)
+                    {
+                        result.Append("</ol>");
+                        inOrderedList = false;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        if (!line.StartsWith("<h") && !line.StartsWith("<ul") && !line.StartsWith("<ol"))
+                        {
+                            result.Append("<p>").Append(line).Append("</p>");
+                        }
+                        else
+                        {
+                            result.Append(line);
+                        }
+                    }
+                }
+            }
+
+            if (inList)
+            {
+                result.Append("</ul>");
+            }
+            if (inOrderedList)
+            {
+                result.Append("</ol>");
+            }
+
+            return result.ToString();
+        }
+
         private List<string> GetCategories()
         {
             var categories = new List<string>();
@@ -290,7 +603,7 @@ namespace FileGallery
             {
                 return new DirectoryInfo(categoryPath)
                     .GetFiles()
-                    .Where(f => f.Name != ".gitkeep")
+                    .Where(f => f.Name != ".gitkeep" && f.Extension.ToLower() != ".md")
                     .ToList();
             }
             return new List<FileInfo>();

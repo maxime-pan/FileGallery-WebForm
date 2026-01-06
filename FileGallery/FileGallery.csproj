@@ -96,6 +96,9 @@
     <Folder Include="PublicUploads\" />
     <Folder Include="Uploads\General\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="FileHandler.ashx" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
